@@ -1,0 +1,230 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://stage-agent.local/contracts/stage-export-schema.v1.json",
+    "title": "StageExportV1",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schemaVersion",
+        "exportedAt",
+        "stage",
+        "assets",
+        "elements",
+        "checklist",
+        "runNotes"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "type": "string",
+            "const": "1.0.0"
+        },
+        "exportedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "stage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "title",
+                "disciplineLabel",
+                "updatedAt"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                },
+                "disciplineLabel": {
+                    "type": "string",
+                    "maxLength": 80
+                },
+                "location": {
+                    "type": "string",
+                    "maxLength": 120
+                },
+                "notes": {
+                    "type": "string",
+                    "maxLength": 4000
+                },
+                "updatedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "assets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "name",
+                    "category",
+                    "isCustom",
+                    "defaultWidth",
+                    "defaultHeight"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 120
+                    },
+                    "category": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 60
+                    },
+                    "isCustom": {
+                        "type": "boolean"
+                    },
+                    "defaultWidth": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "defaultHeight": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "notes": {
+                        "type": "string",
+                        "maxLength": 1000
+                    }
+                }
+            }
+        },
+        "elements": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "stageId",
+                    "assetId",
+                    "x",
+                    "y",
+                    "width",
+                    "height",
+                    "rotationDeg",
+                    "zIndex"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "stageId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "assetId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    },
+                    "width": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "height": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                    },
+                    "rotationDeg": {
+                        "type": "number"
+                    },
+                    "zIndex": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                }
+            }
+        },
+        "checklist": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "stageId",
+                    "text",
+                    "isDone",
+                    "updatedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "stageId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 500
+                    },
+                    "isDone": {
+                        "type": "boolean"
+                    },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "runNotes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "stageId",
+                    "text",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "stageId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    }
+}

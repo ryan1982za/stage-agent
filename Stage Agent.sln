@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{9C6578E7-E4FE-79BB-1635-F363CC1E80DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mcp", "mcp", "{85FDAC69-D9E7-264E-48BF-C8586037C367}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{33884871-B2F3-0F5B-E241-D66AF7636A64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gaia.Mcp.Server", ".github\mcp\src\Gaia.Mcp.Server\Gaia.Mcp.Server.csproj", "{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mcp-workflows", "mcp-workflows", "{DFF5DB61-3903-A93D-7556-62310209DB2F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{373163EB-D755-AA83-1F1A-AC5E6690816E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gaia.Workflows.Server", ".github\mcp-workflows\src\Gaia.Workflows.Server\Gaia.Workflows.Server.csproj", "{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{85FDAC69-D9E7-264E-48BF-C8586037C367} = {9C6578E7-E4FE-79BB-1635-F363CC1E80DD}
+		{33884871-B2F3-0F5B-E241-D66AF7636A64} = {85FDAC69-D9E7-264E-48BF-C8586037C367}
+		{2C0924D5-0277-4DF1-BCDC-05E618EB8C3B} = {33884871-B2F3-0F5B-E241-D66AF7636A64}
+		{DFF5DB61-3903-A93D-7556-62310209DB2F} = {9C6578E7-E4FE-79BB-1635-F363CC1E80DD}
+		{373163EB-D755-AA83-1F1A-AC5E6690816E} = {DFF5DB61-3903-A93D-7556-62310209DB2F}
+		{127F84C4-BAE7-9D94-DF5A-BB113A6E0A09} = {373163EB-D755-AA83-1F1A-AC5E6690816E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {69A174D4-2FD8-441E-99D8-8EC849558C43}
+	EndGlobalSection
+EndGlobal
