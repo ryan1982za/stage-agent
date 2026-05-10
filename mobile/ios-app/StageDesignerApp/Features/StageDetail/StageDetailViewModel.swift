@@ -59,14 +59,15 @@ final class StageDetailViewModel: ObservableObject {
         self.exportStageUseCase = container.exportStageUseCase
         self.stageVisualExportService = container.stageVisualExportService
         self.defaultAssetId = container.defaultAssetId
-        self.availableAssets = container.availableAssets.sorted {
+        let sortedAssets = container.availableAssets.sorted {
             if $0.category == $1.category {
                 return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
             return $0.category.localizedCaseInsensitiveCompare($1.category) == .orderedAscending
         }
-        self.assetNamesById = Dictionary(uniqueKeysWithValues: self.availableAssets.map { ($0.id, $0) })
-        self.selectedAssetId = self.availableAssets.first?.id
+        self.availableAssets = sortedAssets
+        self.assetNamesById = Dictionary(uniqueKeysWithValues: sortedAssets.map { ($0.id, $0) })
+        self.selectedAssetId = sortedAssets.first?.id
 
         refresh()
     }
