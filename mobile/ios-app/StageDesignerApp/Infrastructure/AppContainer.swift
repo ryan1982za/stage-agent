@@ -11,6 +11,7 @@ struct AppContainer {
     let exportStageUseCase: ExportStageUseCase
     let writeStageExportFilesUseCase: WriteStageExportFilesUseCase
     let addStageElementUseCase: AddStageElementUseCase
+    let removeStageElementUseCase: RemoveStageElementUseCase
     let addChecklistItemUseCase: AddChecklistItemUseCase
     let toggleChecklistItemUseCase: ToggleChecklistItemUseCase
     let addRunNoteUseCase: AddRunNoteUseCase
@@ -19,7 +20,6 @@ struct AppContainer {
     let defaultAssetId: UUID?
     let availableAssets: [AssetDefinition]
 
-        let removeStageElementUseCase: RemoveStageElementUseCase
     static func makeDefault() -> AppContainer {
         do {
             let dbPath = try defaultDatabasePath()
@@ -45,6 +45,7 @@ struct AppContainer {
             exportStageUseCase: exportUseCase,
             writeStageExportFilesUseCase: WriteStageExportFilesUseCase(exportStageUseCase: exportUseCase),
             addStageElementUseCase: AddStageElementUseCase(stageRepository: stageRepository, assetRepository: assetRepository),
+            removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository),
             addChecklistItemUseCase: AddChecklistItemUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             toggleChecklistItemUseCase: ToggleChecklistItemUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             addRunNoteUseCase: AddRunNoteUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
@@ -52,9 +53,8 @@ struct AppContainer {
             stageVisualExportService: StageVisualExportService(),
             defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
             availableAssets: BuiltInAssets.v1Catalog
-                removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository)
-            )
-        }
+        )
+    }
 
     private static func defaultDatabasePath() throws -> String {
         let fm = FileManager.default
@@ -114,6 +114,7 @@ struct AppContainer {
             exportStageUseCase: exportUseCase,
             writeStageExportFilesUseCase: WriteStageExportFilesUseCase(exportStageUseCase: exportUseCase),
             addStageElementUseCase: AddStageElementUseCase(stageRepository: stageRepository, assetRepository: assetRepository),
+            removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository),
             addChecklistItemUseCase: AddChecklistItemUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             toggleChecklistItemUseCase: ToggleChecklistItemUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             addRunNoteUseCase: AddRunNoteUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
@@ -121,7 +122,6 @@ struct AppContainer {
             stageVisualExportService: StageVisualExportService(),
             defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
             availableAssets: BuiltInAssets.v1Catalog
-                removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository)
-          )
+        )
     }
 }
