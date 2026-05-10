@@ -1,12 +1,18 @@
 import Foundation
 import StageDesignerDomain
+import StageDesignerPersistence
 
 /// Use case for removing a stage element from a stage.
 public final class RemoveStageElementUseCase {
     private let stageRepository: StageRepository
+    private let validationService: StageValidationService
 
-    public init(stageRepository: StageRepository) {
+    public init(
+        stageRepository: StageRepository,
+        validationService: StageValidationService = StageValidationService()
+    ) {
         self.stageRepository = stageRepository
+        self.validationService = validationService
     }
 
     public struct Input {
@@ -20,24 +26,14 @@ public final class RemoveStageElementUseCase {
     }
 
     public func execute(_ input: Input) throws {
-        let stages = try stageRepository.fetchAllStages()
-        guard let stage = stages.first(where: { $0.id == input.stageId }) else {
+        guard var stage = try stageRepository.fetchStage(id: input.stageId) else {
             throw NSError(domain: "RemoveStageElementUseCase", code: 1, userInfo: [NSLocalizedDescriptionKey: "Stage not found"])
         }
 
-        let filteredElements = stage.elements.filter { $0.id != input.elementId }
-        let updatedStage = Stage(
-            id: stage.id,
-            title: stage.title,
-            disciplineLabel: stage.disciplineLabel,
-            location: stage.location,
-            notes: stage.notes,
-            elements: filteredElements,
-            checklist: stage.checklist,
-            runNotes: stage.runNotes,
-            updatedAt: Date()
-        )
+        stage.elements.removeAll(where: { $0.id == input.elementId })
+        stage.updatedAt = Date()
 
-        try stageRepository.saveStage(updatedStage)
+        try validationService.validate(stage)
+        try stageRepository.upsertStage(stage)
     }
 }
