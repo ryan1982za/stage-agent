@@ -47,6 +47,8 @@ final class StageDetailViewModel: ObservableObject {
     private let defaultAssetId: UUID?
     private let assetNamesById: [UUID: AssetDefinition]
 
+        private let removeStageElementUseCase: RemoveStageElementUseCase
+
     init(stageId: UUID, container: AppContainer) {
         self.stageId = stageId
         self.listStagesUseCase = container.listStagesUseCase
@@ -59,6 +61,7 @@ final class StageDetailViewModel: ObservableObject {
         self.exportStageUseCase = container.exportStageUseCase
         self.stageVisualExportService = container.stageVisualExportService
         self.defaultAssetId = container.defaultAssetId
+            self.removeStageElementUseCase = container.removeStageElementUseCase
         let sortedAssets = container.availableAssets.sorted {
             if $0.category == $1.category {
                 return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
@@ -249,3 +252,35 @@ final class StageDetailViewModel: ObservableObject {
             }
     }
 }
+        func addElementAtCanvasPosition(x: Double, y: Double) {
+            guard let assetId = selectedAssetId else {
+                errorMessage = "Select an asset first."
+                return
+            }
+
+            do {
+                isBusy = true
+                defer { isBusy = false }
+                _ = try addStageElementUseCase.execute(
+                    AddStageElementInput(stageId: stageId, assetId: assetId, x: x, y: y)
+                )
+                refresh()
+                errorMessage = nil
+            } catch {
+                errorMessage = "Failed to add element."
+            }
+        }
+
+        func deleteElement(withId elementId: UUID) {
+            do {
+                isBusy = true
+                defer { isBusy = false }
+                try removeStageElementUseCase.execute(
+                    RemoveStageElementUseCase.Input(stageId: stageId, elementId: elementId)
+                )
+                refresh()
+                errorMessage = nil
+            } catch {
+                errorMessage = "Failed to delete element."
+            }
+        }

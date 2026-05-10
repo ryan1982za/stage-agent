@@ -19,6 +19,7 @@ struct AppContainer {
     let defaultAssetId: UUID?
     let availableAssets: [AssetDefinition]
 
+        let removeStageElementUseCase: RemoveStageElementUseCase
     static func makeDefault() -> AppContainer {
         do {
             let dbPath = try defaultDatabasePath()
@@ -51,8 +52,9 @@ struct AppContainer {
             stageVisualExportService: StageVisualExportService(),
             defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
             availableAssets: BuiltInAssets.v1Catalog
-        )
-    }
+                removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository)
+            )
+        }
 
     private static func defaultDatabasePath() throws -> String {
         let fm = FileManager.default
@@ -119,6 +121,7 @@ struct AppContainer {
             stageVisualExportService: StageVisualExportService(),
             defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
             availableAssets: BuiltInAssets.v1Catalog
-        )
+                removeStageElementUseCase: RemoveStageElementUseCase(stageRepository: stageRepository)
+          )
     }
 }
