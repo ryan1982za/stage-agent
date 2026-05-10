@@ -125,6 +125,9 @@ jobs:
 
             - name: Install provisioning profile
               if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
+              env:
+                  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+                  IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER || 'com.stage.agent.mobile' }}
               run: |
                   mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
                   echo "${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}" | base64 -D > "$HOME/Library/MobileDevice/Provisioning Profiles/release.mobileprovision"
@@ -139,6 +142,16 @@ jobs:
 
                   echo "PROFILE_UUID=${profile_uuid}" >> "$GITHUB_ENV"
                   echo "PROFILE_NAME=${profile_name}" >> "$GITHUB_ENV"
+
+                  profile_app_id=$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$profile_decoded")
+                  expected_app_id="${APPLE_TEAM_ID}.${IOS_BUNDLE_IDENTIFIER}"
+                  wildcard_app_id="${APPLE_TEAM_ID}.*"
+
+                  if [ "$profile_app_id" != "$expected_app_id" ] && [ "$profile_app_id" != "$wildcard_app_id" ]; then
+                    echo "Provisioning profile app ID '$profile_app_id' does not match expected '$expected_app_id'."
+                    echo "Upload a profile for bundle identifier '${IOS_BUNDLE_IDENTIFIER}' and retry."
+                    exit 1
+                  fi
 
             - name: Detect iOS scheme
               if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
