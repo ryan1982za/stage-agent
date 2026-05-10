@@ -9,6 +9,8 @@ settings:
     PRODUCT_NAME: Stage Agent
     PRODUCT_BUNDLE_IDENTIFIER: com.stage.agent.mobile
     SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0.2"
+    CURRENT_PROJECT_VERSION: "1"
     INFOPLIST_KEY_CFBundleDisplayName: Stage Agent
     INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.sports
     INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
