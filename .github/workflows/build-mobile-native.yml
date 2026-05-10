@@ -188,6 +188,9 @@ jobs:
               env:
                   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
               run: |
+                  BUILD_NUMBER=$(( ${{ github.run_number }} * 100 + ${{ github.run_attempt }} ))
+                  echo "Using iOS build number: ${BUILD_NUMBER}"
+
                   archive_args=(
                     -scheme "${{ steps.ios-scheme.outputs.name }}"
                     -configuration Release
@@ -199,7 +202,7 @@ jobs:
                     PROVISIONING_PROFILE="$PROFILE_UUID"
                     PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME"
                     MARKETING_VERSION="0.1"
-                    CURRENT_PROJECT_VERSION="1"
+                    CURRENT_PROJECT_VERSION="${BUILD_NUMBER}"
                   )
 
                   if [ "${{ steps.ios-project.outputs.kind }}" = "workspace" ]; then
