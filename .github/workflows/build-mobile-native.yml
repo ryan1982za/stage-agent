@@ -50,6 +50,17 @@ jobs:
                   swift --version
                   swift test
 
+            - name: Generate iOS Xcode project
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
+              working-directory: ./mobile/ios-app/StageDesignerApp
+              run: |
+                  if ! command -v xcodegen >/dev/null 2>&1; then
+                    brew update
+                    brew install xcodegen
+                  fi
+
+                  xcodegen generate
+
             - name: Locate iOS app project/workspace
               if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
               id: ios-project
@@ -66,7 +77,7 @@ jobs:
                     echo "path=$project" >> "$GITHUB_OUTPUT"
                   else
                     echo "No .xcworkspace or .xcodeproj found under mobile/ios-app/StageDesignerApp."
-                    echo "Create an Xcode project before enabling App Store uploads."
+                    echo "Ensure project.yml exists and xcodegen generate runs successfully before App Store upload."
                     exit 1
                   fi
 
