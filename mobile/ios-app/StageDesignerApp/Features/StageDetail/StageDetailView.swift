@@ -1,4 +1,5 @@
 import SwiftUI
+import StageDesignerDomain
 
 struct StageDetailView: View {
     @ObservedObject var viewModel: StageDetailViewModel

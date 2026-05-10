@@ -1,4 +1,5 @@
 import SwiftUI
+import StageDesignerDomain
 
 struct StageListView: View {
     @ObservedObject var viewModel: StageListViewModel
@@ -97,7 +98,7 @@ struct StageListView: View {
                 ForEach(viewModel.stages) { stage in
                     stageRow(stage)
                         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                        .listRowSeparator(.hidden)
+                        .listRowSeparator(Visibility.hidden)
                         .listRowBackground(Color.clear)
                 }
             } header: {
