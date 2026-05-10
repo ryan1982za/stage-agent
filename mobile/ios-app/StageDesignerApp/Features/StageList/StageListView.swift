@@ -120,8 +120,16 @@ struct StageListView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Stage Agent")
-                .font(.largeTitle.weight(.bold))
+            HStack(spacing: 12) {
+                Image("StageAgentMark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 42, height: 42)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                Text("Stage Agent")
+                    .font(.largeTitle.weight(.bold))
+            }
             Text("Create stages, review details, and export deliverables in one place.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

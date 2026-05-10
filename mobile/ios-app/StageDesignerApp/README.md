@@ -50,6 +50,33 @@ Then in Xcode:
 
 Note: `project.yml` is the source of truth for this wrapper project. Re-run the bootstrap script after changing source layout or project settings.
 
+## Apply Logo and App Icon Branding
+
+Use the SVG logo at [docs/Stage Agent.svg](../../../docs/Stage%20Agent.svg) to generate iOS-ready app icon and in-app mark assets.
+
+```bash
+cd mobile/ios-app/StageDesignerApp
+bash ./scripts/generate_brand_assets.sh
+```
+
+What this does:
+
+- Converts the SVG into a 1024 master PNG.
+- Generates iPhone app icon sizes into `App/Assets.xcassets/AppIcon.appiconset`.
+- Generates `StageAgentMark` in-app image assets for UI branding.
+
+Then regenerate/open the Xcode project:
+
+```bash
+bash ./scripts/bootstrap_xcode_project.sh
+```
+
+If your logo file is in a different path, pass it explicitly:
+
+```bash
+bash ./scripts/generate_brand_assets.sh "/absolute/path/to/Stage Agent.svg"
+```
+
 ## Next implementation steps
 
 1. Decide whether to commit generated `StageDesignerApp.xcodeproj` or keep `project.yml` + generation script as source of truth.
