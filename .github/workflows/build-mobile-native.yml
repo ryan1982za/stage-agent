@@ -61,6 +61,17 @@ jobs:
 
                   xcodegen generate
 
+            - name: Generate app icons and branding assets
+              if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
+              working-directory: ./mobile/ios-app/StageDesignerApp
+              run: |
+                  if ! command -v rsvg-convert >/dev/null 2>&1; then
+                    brew update
+                    brew install librsvg
+                  fi
+
+                  bash scripts/generate_brand_assets.sh "${GITHUB_WORKSPACE}/docs/Stage Agent.svg"
+
             - name: Locate iOS app project/workspace
               if: ${{ github.event_name == 'workflow_dispatch' && inputs.upload_ios_to_app_store_connect }}
               id: ios-project

@@ -34,11 +34,17 @@ trap cleanup EXIT
 MASTER_PNG="${TMP_DIR}/master-1024.png"
 rsvg-convert -w 1024 -h 1024 "${LOGO_PATH}" -o "${MASTER_PNG}"
 
-# App icons
+# App icons (iPhone and iPad)
 cp "${MASTER_PNG}" "${APPICON_DIR}/app-icon-1024.png"
 
+# iPhone sizes: 40, 60, 58, 87, 80, 120, 180
 for size in 40 60 58 87 80 120 180; do
   sips -z "${size}" "${size}" "${MASTER_PNG}" --out "${APPICON_DIR}/app-icon-${size}.png" >/dev/null
+done
+
+# iPad sizes: 20, 29, 40, 76, 152
+for size in 20 29 40 76 152; do
+  sips -z "${size}" "${size}" "${MASTER_PNG}" --out "${APPICON_DIR}/app-icon-ipad-${size}.png" >/dev/null
 done
 
 cat > "${APPICON_DIR}/Contents.json" <<'JSON'
@@ -52,6 +58,14 @@ cat > "${APPICON_DIR}/Contents.json" <<'JSON'
     { "filename" : "app-icon-120.png", "idiom" : "iphone", "scale" : "3x", "size" : "40x40" },
     { "filename" : "app-icon-120.png", "idiom" : "iphone", "scale" : "2x", "size" : "60x60" },
     { "filename" : "app-icon-180.png", "idiom" : "iphone", "scale" : "3x", "size" : "60x60" },
+    { "filename" : "app-icon-ipad-20.png", "idiom" : "ipad", "scale" : "1x", "size" : "20x20" },
+    { "filename" : "app-icon-ipad-40.png", "idiom" : "ipad", "scale" : "2x", "size" : "20x20" },
+    { "filename" : "app-icon-ipad-29.png", "idiom" : "ipad", "scale" : "1x", "size" : "29x29" },
+    { "filename" : "app-icon-ipad-58.png", "idiom" : "ipad", "scale" : "2x", "size" : "29x29" },
+    { "filename" : "app-icon-ipad-40.png", "idiom" : "ipad", "scale" : "1x", "size" : "40x40" },
+    { "filename" : "app-icon-ipad-80.png", "idiom" : "ipad", "scale" : "2x", "size" : "40x40" },
+    { "filename" : "app-icon-ipad-76.png", "idiom" : "ipad", "scale" : "1x", "size" : "76x76" },
+    { "filename" : "app-icon-ipad-152.png", "idiom" : "ipad", "scale" : "2x", "size" : "76x76" },
     { "filename" : "app-icon-1024.png", "idiom" : "ios-marketing", "scale" : "1x", "size" : "1024x1024" }
   ],
   "info" : {
