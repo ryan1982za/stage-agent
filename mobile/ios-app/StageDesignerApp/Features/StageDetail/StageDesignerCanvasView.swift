@@ -50,8 +50,8 @@ struct StageDesignerCanvasView: View {
             VStack(alignment: .center, spacing: 0) {
                 ZStack {
                     // Grid background
-                    Canvas { context in
-                        drawGrid(in: context)
+                    Canvas { context, size in
+                        drawGrid(in: context, size: size)
                     }
                     .background(Color(.systemBackground))
 
@@ -78,9 +78,12 @@ struct StageDesignerCanvasView: View {
                 .frame(width: canvasWidth, height: canvasHeight)
                 .background(Color(.systemBackground))
                 .border(Color.gray.opacity(0.3), width: 1)
-                .onTapGesture { location in
-                    handleCanvasTap(at: location)
-                }
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onEnded { value in
+                            handleCanvasTap(at: value.location)
+                        }
+                )
             }
 
             // Instructions
@@ -119,20 +122,20 @@ struct StageDesignerCanvasView: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    private func drawGrid(in context: GraphicsContext) {
+    private func drawGrid(in context: GraphicsContext, size: CGSize) {
         var path = Path()
         let step = gridSpacing
 
         // Vertical lines
-        for i in stride(from: 0, through: canvasWidth, by: step) {
+        for i in stride(from: 0, through: size.width, by: step) {
             path.move(to: CGPoint(x: i, y: 0))
-            path.addLine(to: CGPoint(x: i, y: canvasHeight))
+            path.addLine(to: CGPoint(x: i, y: size.height))
         }
 
         // Horizontal lines
-        for i in stride(from: 0, through: canvasHeight, by: step) {
+        for i in stride(from: 0, through: size.height, by: step) {
             path.move(to: CGPoint(x: 0, y: i))
-            path.addLine(to: CGPoint(x: canvasWidth, y: i))
+            path.addLine(to: CGPoint(x: size.width, y: i))
         }
 
         var stroke = StrokeStyle(lineWidth: 0.5)

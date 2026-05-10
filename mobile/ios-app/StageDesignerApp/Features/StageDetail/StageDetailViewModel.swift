@@ -232,6 +232,39 @@ final class StageDetailViewModel: ObservableObject {
         isShowingShareSheet = false
     }
 
+    func addElementAtCanvasPosition(x: Double, y: Double) {
+        guard let assetId = selectedAssetId else {
+            errorMessage = "Select an asset first."
+            return
+        }
+
+        do {
+            isBusy = true
+            defer { isBusy = false }
+            _ = try addStageElementUseCase.execute(
+                AddStageElementInput(stageId: stageId, assetId: assetId, x: x, y: y)
+            )
+            refresh()
+            errorMessage = nil
+        } catch {
+            errorMessage = "Failed to add element."
+        }
+    }
+
+    func deleteElement(withId elementId: UUID) {
+        do {
+            isBusy = true
+            defer { isBusy = false }
+            try removeStageElementUseCase.execute(
+                RemoveStageElementUseCase.Input(stageId: stageId, elementId: elementId)
+            )
+            refresh()
+            errorMessage = nil
+        } catch {
+            errorMessage = "Failed to delete element."
+        }
+    }
+
     private func buildElementRows(from stage: Stage?) -> [StageElementRow] {
         guard let stage else { return [] }
         return stage.elements
@@ -252,35 +285,3 @@ final class StageDetailViewModel: ObservableObject {
             }
     }
 }
-        func addElementAtCanvasPosition(x: Double, y: Double) {
-            guard let assetId = selectedAssetId else {
-                errorMessage = "Select an asset first."
-                return
-            }
-
-            do {
-                isBusy = true
-                defer { isBusy = false }
-                _ = try addStageElementUseCase.execute(
-                    AddStageElementInput(stageId: stageId, assetId: assetId, x: x, y: y)
-                )
-                refresh()
-                errorMessage = nil
-            } catch {
-                errorMessage = "Failed to add element."
-            }
-        }
-
-        func deleteElement(withId elementId: UUID) {
-            do {
-                isBusy = true
-                defer { isBusy = false }
-                try removeStageElementUseCase.execute(
-                    RemoveStageElementUseCase.Input(stageId: stageId, elementId: elementId)
-                )
-                refresh()
-                errorMessage = nil
-            } catch {
-                errorMessage = "Failed to delete element."
-            }
-        }
