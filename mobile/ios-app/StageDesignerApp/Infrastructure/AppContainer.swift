@@ -17,6 +17,7 @@ struct AppContainer {
     let getStageNotesSnapshotUseCase: GetStageNotesSnapshotUseCase
     let stageVisualExportService: StageVisualExportService
     let defaultAssetId: UUID?
+    let availableAssets: [AssetDefinition]
 
     static func makeDefault() -> AppContainer {
         do {
@@ -48,7 +49,8 @@ struct AppContainer {
             addRunNoteUseCase: AddRunNoteUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             getStageNotesSnapshotUseCase: GetStageNotesSnapshotUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             stageVisualExportService: StageVisualExportService(),
-            defaultAssetId: BuiltInAssets.v1Catalog.first?.id
+            defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
+            availableAssets: BuiltInAssets.v1Catalog
         )
     }
 
@@ -115,7 +117,8 @@ struct AppContainer {
             addRunNoteUseCase: AddRunNoteUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             getStageNotesSnapshotUseCase: GetStageNotesSnapshotUseCase(stageRepository: stageRepository, notesRepository: notesRepository),
             stageVisualExportService: StageVisualExportService(),
-            defaultAssetId: BuiltInAssets.v1Catalog.first?.id
+            defaultAssetId: BuiltInAssets.v1Catalog.first?.id,
+            availableAssets: BuiltInAssets.v1Catalog
         )
     }
 }

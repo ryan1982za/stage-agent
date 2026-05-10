@@ -4,10 +4,27 @@ import StageDesignerDomain
 
 @MainActor
 final class StageDetailViewModel: ObservableObject {
+    struct StageElementRow: Identifiable {
+        let id: UUID
+        let name: String
+        let category: String
+        let x: Double
+        let y: Double
+        let width: Double
+        let height: Double
+        let rotationDeg: Double
+        let zIndex: Int
+    }
+
     @Published private(set) var stage: Stage?
     @Published private(set) var checklist: [ChecklistItem] = []
     @Published private(set) var runNotes: [RunNote] = []
+    @Published private(set) var availableAssets: [AssetDefinition] = []
+    @Published private(set) var stageElementRows: [StageElementRow] = []
     @Published var titleDraft: String = ""
+    @Published var selectedAssetId: UUID?
+    @Published var placementXDraft: String = "1.0"
+    @Published var placementYDraft: String = "1.0"
     @Published var checklistDraft: String = ""
     @Published var runNoteDraft: String = ""
     @Published var exportPreviewText: String?
@@ -28,6 +45,7 @@ final class StageDetailViewModel: ObservableObject {
     private let exportStageUseCase: ExportStageUseCase
     private let stageVisualExportService: StageVisualExportService
     private let defaultAssetId: UUID?
+    private let assetNamesById: [UUID: AssetDefinition]
 
     init(stageId: UUID, container: AppContainer) {
         self.stageId = stageId
@@ -41,6 +59,14 @@ final class StageDetailViewModel: ObservableObject {
         self.exportStageUseCase = container.exportStageUseCase
         self.stageVisualExportService = container.stageVisualExportService
         self.defaultAssetId = container.defaultAssetId
+        self.availableAssets = container.availableAssets.sorted {
+            if $0.category == $1.category {
+                return $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+            return $0.category.localizedCaseInsensitiveCompare($1.category) == .orderedAscending
+        }
+        self.assetNamesById = Dictionary(uniqueKeysWithValues: self.availableAssets.map { ($0.id, $0) })
+        self.selectedAssetId = self.availableAssets.first?.id
 
         refresh()
     }
@@ -52,6 +78,7 @@ final class StageDetailViewModel: ObservableObject {
             let snapshot = try getStageNotesSnapshotUseCase.execute(stageId: stageId)
             checklist = snapshot.checklist
             runNotes = snapshot.runNotes
+            stageElementRows = buildElementRows(from: stage)
             errorMessage = nil
         } catch {
             errorMessage = "Failed to load stage detail."
@@ -83,8 +110,23 @@ final class StageDetailViewModel: ObservableObject {
     }
 
     func addSampleElement() {
-        guard let defaultAssetId else {
-            errorMessage = "No default asset configured."
+        if selectedAssetId == nil {
+            selectedAssetId = defaultAssetId
+        }
+        addSelectedElement()
+    }
+
+    func addSelectedElement() {
+        guard let assetId = selectedAssetId else {
+            errorMessage = "Select an asset first."
+            return
+        }
+
+        guard let x = Double(placementXDraft.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let y = Double(placementYDraft.trimmingCharacters(in: .whitespacesAndNewlines)),
+              x >= 0,
+              y >= 0 else {
+            errorMessage = "Enter valid X/Y coordinates (0 or greater)."
             return
         }
 
@@ -92,9 +134,11 @@ final class StageDetailViewModel: ObservableObject {
             isBusy = true
             defer { isBusy = false }
             _ = try addStageElementUseCase.execute(
-                AddStageElementInput(stageId: stageId, assetId: defaultAssetId, x: Double((stage?.elements.count ?? 0) + 1), y: 1)
+                AddStageElementInput(stageId: stageId, assetId: assetId, x: x, y: y)
             )
+            placementXDraft = String(format: "%.2f", x + 0.5)
             refresh()
+            errorMessage = nil
         } catch {
             errorMessage = "Failed to add element."
         }
@@ -182,5 +226,25 @@ final class StageDetailViewModel: ObservableObject {
 
     func dismissShareSheet() {
         isShowingShareSheet = false
+    }
+
+    private func buildElementRows(from stage: Stage?) -> [StageElementRow] {
+        guard let stage else { return [] }
+        return stage.elements
+            .sorted(by: { $0.zIndex < $1.zIndex })
+            .map { element in
+                let asset = assetNamesById[element.assetId]
+                return StageElementRow(
+                    id: element.id,
+                    name: asset?.name ?? "Unknown Asset",
+                    category: asset?.category ?? "Unknown",
+                    x: element.x,
+                    y: element.y,
+                    width: element.width,
+                    height: element.height,
+                    rotationDeg: element.rotationDeg,
+                    zIndex: element.zIndex
+                )
+            }
     }
 }

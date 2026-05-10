@@ -8,6 +8,8 @@ struct StageDetailView: View {
 
     private enum InputField {
         case title
+        case placementX
+        case placementY
         case checklist
         case runNote
     }
@@ -17,6 +19,7 @@ struct StageDetailView: View {
             VStack(alignment: .leading, spacing: 14) {
                 if let stage = viewModel.stage {
                     metadataCard(stage)
+                    stageDesignerCard
                     checklistCard
                     runNotesCard
                     exportCard
@@ -46,6 +49,11 @@ struct StageDetailView: View {
             switch focusedInput {
             case .title:
                 viewModel.saveTitle()
+                focusedInput = nil
+            case .placementX:
+                focusedInput = .placementY
+            case .placementY:
+                viewModel.addSelectedElement()
                 focusedInput = nil
             case .checklist:
                 viewModel.addChecklistItem()
@@ -105,11 +113,6 @@ struct StageDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("Add Element") {
-                    viewModel.addSampleElement()
-                }
-                .buttonStyle(.bordered)
-
                 Spacer(minLength: 0)
 
                 Text("Elements: \(stage.elements.count)")
@@ -118,6 +121,76 @@ struct StageDetailView: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
                     .background(.quaternary.opacity(0.6), in: Capsule())
+            }
+        }
+        .padding(14)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var stageDesignerCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "scope")
+                    .foregroundStyle(.secondary)
+                Text("Stage Designer")
+                    .font(.headline)
+            }
+
+            Picker("Asset", selection: $viewModel.selectedAssetId) {
+                Text("Select asset").tag(nil as UUID?)
+                ForEach(viewModel.availableAssets) { asset in
+                    Text("\(asset.category): \(asset.name)").tag(Optional(asset.id))
+                }
+            }
+            .pickerStyle(.menu)
+
+            HStack {
+                TextField("X", text: $viewModel.placementXDraft)
+                    .textFieldStyle(.roundedBorder)
+                    .keyboardType(.decimalPad)
+                    .focused($focusedInput, equals: .placementX)
+                    .submitLabel(.next)
+
+                TextField("Y", text: $viewModel.placementYDraft)
+                    .textFieldStyle(.roundedBorder)
+                    .keyboardType(.decimalPad)
+                    .focused($focusedInput, equals: .placementY)
+                    .submitLabel(.done)
+
+                Button("Add") {
+                    viewModel.addSelectedElement()
+                    focusedInput = nil
+                }
+                .buttonStyle(.borderedProminent)
+            }
+
+            if viewModel.stageElementRows.isEmpty {
+                Text("No stage elements yet. Pick an asset and place it using X/Y coordinates.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 2)
+            } else {
+                ForEach(viewModel.stageElementRows) { row in
+                    HStack(spacing: 8) {
+                        Text("#\(row.zIndex)")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 30, alignment: .leading)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(row.name)
+                                .font(.subheadline.weight(.semibold))
+                            Text("\(row.category)  •  x:\(row.x, specifier: "%.2f") y:\(row.y, specifier: "%.2f")  •  w:\(row.width, specifier: "%.2f") h:\(row.height, specifier: "%.2f")")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
             }
         }
         .padding(14)
