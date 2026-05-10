@@ -50,6 +50,12 @@ Then in Xcode:
 
 Note: `project.yml` is the source of truth for this wrapper project. Re-run the bootstrap script after changing source layout or project settings.
 
+## CI Bundle Identifier
+
+- The app wrapper bundle identifier is `com.stage.agent.mobile` (defined in `project.yml`).
+- Keep GitHub Actions variable `IOS_BUNDLE_IDENTIFIER` set to `com.stage.agent.mobile` for App Store signing/export.
+- If this variable and the provisioning profile target do not match, archive/export can fail with signing/profile mismatch errors.
+
 ## Apply Logo and App Icon Branding
 
 Use the SVG logo at [docs/Stage Agent.svg](../../../docs/Stage%20Agent.svg) to generate iOS-ready app icon and in-app mark assets.

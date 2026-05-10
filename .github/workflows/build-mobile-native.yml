@@ -77,7 +77,7 @@ jobs:
                   IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
                   IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
                   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-                  IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER }}
+                  IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER || 'com.stage.agent.mobile' }}
                   APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
                   APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
                   APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
@@ -176,7 +176,7 @@ jobs:
               working-directory: ./mobile/ios-app/StageDesignerApp
               env:
                   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-                  IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER }}
+                  IOS_BUNDLE_IDENTIFIER: ${{ vars.IOS_BUNDLE_IDENTIFIER || 'com.stage.agent.mobile' }}
               run: |
                   cat > ExportOptions.plist <<EOF
                   <?xml version="1.0" encoding="UTF-8"?>
