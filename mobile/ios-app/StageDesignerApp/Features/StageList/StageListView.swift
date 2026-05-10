@@ -7,115 +7,156 @@ struct StageListView: View {
     @FocusState private var isTitleFocused: Bool
 
     var body: some View {
+        stageListContent
+    }
+
+    private var stageListContent: some View {
         VStack(spacing: 0) {
             header
 
-            if let message = viewModel.errorMessage {
-                messageBanner(message, tone: .error)
-                    .padding(.horizontal)
-                    .padding(.top, 10)
-            }
-
-            if let message = viewModel.lastExportPathMessage {
-                messageBanner(message, tone: .success)
-                    .padding(.horizontal)
-                    .padding(.top, 10)
-            }
-
-            if !hasDismissedOnboarding && !viewModel.hasExportedOnce {
-                onboardingCard
-                    .padding(.horizontal)
-                    .padding(.top, 10)
-            }
-
-            if viewModel.stages.isEmpty {
-                VStack(spacing: 16) {
-                    ContentUnavailableView(
-                        "No Stages Yet",
-                        systemImage: "square.and.pencil",
-                        description: Text("Create your first stage to begin placing elements, adding notes, and exporting layouts.")
-                    )
-
-                    Text("Tip: start with a short, clear title like 'Range A Morning Setup'.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                List {
-                    Section {
-                        ForEach(viewModel.stages) { stage in
-                            stageRow(stage)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                                .listRowSeparator(.hidden)
-                                .listRowBackground(Color.clear)
-                        }
-                    } header: {
-                        HStack {
-                            Text("Your Stages")
-                            Spacer(minLength: 0)
-                            Text("\(viewModel.stages.count)")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(.quaternary.opacity(0.75), in: Capsule())
-                        }
-                        .textCase(nil)
-                    }
-                }
-                .listStyle(.plain)
-            }
+            statusBanners
+            onboardingSection
+            stagesContent
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("Stages")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    viewModel.refresh()
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .accessibilityLabel("Refresh stages")
-            }
-        }
+        .toolbar { refreshToolbarItem }
         .onAppear {
             viewModel.refresh()
         }
         .onSubmit {
             createStageFromDraft()
         }
-        .sheet(isPresented: $isShowingExportPreview) {
-            NavigationStack {
-                ScrollView {
-                    Text(viewModel.exportPreviewText ?? "No export data")
-                        .font(.system(.footnote, design: .monospaced))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                }
-                .navigationTitle("Export Preview")
-            }
-        }
+        .sheet(isPresented: $isShowingExportPreview) { exportPreviewSheet }
         .confirmationDialog(
             "Delete Stage?",
             isPresented: $viewModel.isShowingDeleteConfirmation,
-            presenting: viewModel.pendingDeleteStage
-        ) { stage in
+            presenting: viewModel.pendingDeleteStage,
+            actions: deleteStageDialogActions,
+            message: deleteStageDialogMessage
+        )
+        .overlay {
+            busyOverlay
+        }
+    }
+
+    @ViewBuilder
+    private var statusBanners: some View {
+        if let message = viewModel.errorMessage {
+            messageBanner(message, tone: .error)
+                .padding(.horizontal)
+                .padding(.top, 10)
+        }
+
+        if let message = viewModel.lastExportPathMessage {
+            messageBanner(message, tone: .success)
+                .padding(.horizontal)
+                .padding(.top, 10)
+        }
+    }
+
+    @ViewBuilder
+    private var onboardingSection: some View {
+        if !hasDismissedOnboarding && !viewModel.hasExportedOnce {
+            onboardingCard
+                .padding(.horizontal)
+                .padding(.top, 10)
+        }
+    }
+
+    @ViewBuilder
+    private var stagesContent: some View {
+        if viewModel.stages.isEmpty {
+            emptyState
+        } else {
+            stageList
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            ContentUnavailableView(
+                "No Stages Yet",
+                systemImage: "square.and.pencil",
+                description: Text("Create your first stage to begin placing elements, adding notes, and exporting layouts.")
+            )
+
+            Text("Tip: start with a short, clear title like 'Range A Morning Setup'.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var stageList: some View {
+        List {
+            Section {
+                ForEach(viewModel.stages) { stage in
+                    stageRow(stage)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                }
+            } header: {
+                stageListHeader
+            }
+        }
+        .listStyle(.plain)
+    }
+
+    private var stageListHeader: some View {
+        HStack {
+            Text("Your Stages")
+            Spacer(minLength: 0)
+            Text("\(viewModel.stages.count)")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(.quaternary.opacity(0.75), in: Capsule())
+        }
+        .textCase(nil)
+    }
+
+    private var refreshToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                viewModel.refresh()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+            }
+            .accessibilityLabel("Refresh stages")
+        }
+    }
+
+    private var exportPreviewSheet: some View {
+        NavigationStack {
+            ScrollView {
+                Text(viewModel.exportPreviewText ?? "No export data")
+                    .font(.system(.footnote, design: .monospaced))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
+            .navigationTitle("Export Preview")
+        }
+    }
+
+    private func deleteStageDialogActions(for stage: Stage) -> some View {
+        Group {
             Button("Delete \(stage.title)", role: .destructive) {
                 viewModel.confirmDeletePendingStage()
             }
             Button("Cancel", role: .cancel) {
                 viewModel.pendingDeleteStage = nil
             }
-        } message: { stage in
-            Text("This removes \(stage.title) from your stage list.")
         }
-        .overlay {
-            busyOverlay
-        }
+    }
+
+    private func deleteStageDialogMessage(for stage: Stage) -> some View {
+        Text("This removes \(stage.title) from your stage list.")
     }
 
     private var header: some View {
