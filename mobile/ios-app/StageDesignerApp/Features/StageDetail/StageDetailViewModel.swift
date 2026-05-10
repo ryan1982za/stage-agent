@@ -14,6 +14,7 @@ final class StageDetailViewModel: ObservableObject {
     @Published var lastExportPathMessage: String?
     @Published var shareFileURLs: [URL] = []
     @Published var isShowingShareSheet: Bool = false
+    @Published var isBusy: Bool = false
     @Published var errorMessage: String?
 
     private let stageId: UUID
@@ -64,6 +65,8 @@ final class StageDetailViewModel: ObservableObject {
         }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try updateStageMetadataUseCase.execute(
                 UpdateStageMetadataInput(
                     stageId: stage.id,
@@ -86,6 +89,8 @@ final class StageDetailViewModel: ObservableObject {
         }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try addStageElementUseCase.execute(
                 AddStageElementInput(stageId: stageId, assetId: defaultAssetId, x: Double((stage?.elements.count ?? 0) + 1), y: 1)
             )
@@ -100,6 +105,8 @@ final class StageDetailViewModel: ObservableObject {
         guard !text.isEmpty else { return }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try addChecklistItemUseCase.execute(stageId: stageId, text: text)
             checklistDraft = ""
             refresh()
@@ -110,6 +117,8 @@ final class StageDetailViewModel: ObservableObject {
 
     func toggleChecklist(_ item: ChecklistItem) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try toggleChecklistItemUseCase.execute(stageId: stageId, itemId: item.id, isDone: !item.isDone)
             refresh()
         } catch {
@@ -122,6 +131,8 @@ final class StageDetailViewModel: ObservableObject {
         guard !text.isEmpty else { return }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try addRunNoteUseCase.execute(stageId: stageId, text: text)
             runNoteDraft = ""
             refresh()
@@ -132,6 +143,8 @@ final class StageDetailViewModel: ObservableObject {
 
     func export(format: ExportFormat) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             let result = try exportStageUseCase.execute(stageId: stageId)
             switch format {
             case .json:
@@ -153,6 +166,8 @@ final class StageDetailViewModel: ObservableObject {
         }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             let outputDir = FileManager.default.temporaryDirectory.appendingPathComponent("stage-visual-exports")
             let baseName = "stage-\(stage.id.uuidString.lowercased())"
             let result = try stageVisualExportService.export(stage: stage, outputDirectory: outputDir, baseFileName: baseName)

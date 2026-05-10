@@ -9,6 +9,10 @@ final class StageListViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var exportPreviewText: String?
     @Published var lastExportPathMessage: String?
+    @Published var isBusy: Bool = false
+    @Published var hasExportedOnce: Bool = false
+    @Published var isShowingDeleteConfirmation: Bool = false
+    @Published var pendingDeleteStage: Stage?
 
     private let listStagesUseCase: ListStagesUseCase
     private let createStageUseCase: CreateStageUseCase
@@ -51,9 +55,12 @@ final class StageListViewModel: ObservableObject {
         }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try createStageUseCase.execute(CreateStageInput(title: title))
             draftTitle = ""
             refresh()
+            errorMessage = nil
         } catch {
             errorMessage = "Failed to create stage."
         }
@@ -61,8 +68,11 @@ final class StageListViewModel: ObservableObject {
 
     func deleteStage(id: UUID) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             try deleteStageUseCase.execute(stageId: id)
             refresh()
+            errorMessage = nil
         } catch {
             errorMessage = "Failed to delete stage."
         }
@@ -70,6 +80,8 @@ final class StageListViewModel: ObservableObject {
 
     func exportStage(id: UUID, format: ExportFormat) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             let result = try exportStageUseCase.execute(stageId: id)
             switch format {
             case .json:
@@ -77,6 +89,7 @@ final class StageListViewModel: ObservableObject {
             case .csv:
                 exportPreviewText = result.csv
             }
+            hasExportedOnce = true
             errorMessage = nil
         } catch {
             errorMessage = "Failed to export stage."
@@ -85,10 +98,13 @@ final class StageListViewModel: ObservableObject {
 
     func exportStageToFiles(id: UUID) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             let outputDir = FileManager.default.temporaryDirectory.appendingPathComponent("stage-exports")
             let base = "stage-\(id.uuidString.lowercased())"
             let result = try writeStageExportFilesUseCase.execute(stageId: id, outputDirectory: outputDir, baseFileName: base)
             lastExportPathMessage = "Saved JSON and CSV to \(result.jsonURL.deletingLastPathComponent().path)"
+            hasExportedOnce = true
             errorMessage = nil
         } catch {
             errorMessage = "Failed to write export files."
@@ -102,6 +118,8 @@ final class StageListViewModel: ObservableObject {
         }
 
         do {
+            isBusy = true
+            defer { isBusy = false }
             _ = try addStageElementUseCase.execute(
                 AddStageElementInput(stageId: stageId, assetId: defaultAssetId, x: 1, y: 1)
             )
@@ -114,6 +132,8 @@ final class StageListViewModel: ObservableObject {
 
     func renameStage(id: UUID, newTitle: String) {
         do {
+            isBusy = true
+            defer { isBusy = false }
             guard let stage = try listStagesUseCase.execute().first(where: { $0.id == id }) else {
                 errorMessage = "Stage not found."
                 return
@@ -134,6 +154,22 @@ final class StageListViewModel: ObservableObject {
         } catch {
             errorMessage = "Failed to rename stage."
         }
+    }
+
+    func requestDelete(for stage: Stage) {
+        pendingDeleteStage = stage
+        isShowingDeleteConfirmation = true
+    }
+
+    func confirmDeletePendingStage() {
+        guard let stage = pendingDeleteStage else {
+            isShowingDeleteConfirmation = false
+            return
+        }
+
+        pendingDeleteStage = nil
+        isShowingDeleteConfirmation = false
+        deleteStage(id: stage.id)
     }
 
     func makeDetailViewModel(stageId: UUID) -> StageDetailViewModel {
